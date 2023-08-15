@@ -1,6 +1,6 @@
 import { http } from "@/utils/http";
-import type { BannerItem, CategoryItem, GuessItem, HotItem, PageResult } from '@/types/home';
-import type { PageParams } from "@/types/global";
+import type { BannerItem, CategoryItem, GuessItem, HotItem } from '@/types/home';
+import type { PageParams, PageResult } from "@/types/global";
 
 /**
  * 首页-广告区域-小程序
