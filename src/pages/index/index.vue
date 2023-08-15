@@ -30,6 +30,7 @@ const getHomeCategoryData = async () => {
 const getHomeHotData = async () => {
   const res = await getHomeHotAPI()
   hotList.value = res.result
+  console.log(res)
 }
 
 // 加载中标记
