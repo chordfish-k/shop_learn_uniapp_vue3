@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { 
-  getHomeBannerAPI, 
-  getHomeCategoryAPI, 
-  getHomeHotAPI } from '@/services/home';
+import {
+  getHomeBannerAPI,
+  getHomeCategoryAPI,
+  getHomeHotAPI
+} from '@/services/home';
 import type { BannerItem, CategoryItem, HotItem } from '@/types/home';
 import type { XtxGuessInstance } from '@/types/components'
 import { onLoad } from '@dcloudio/uni-app';
@@ -12,6 +13,7 @@ import CustomNavbar from './components/CustomNavbar.vue'
 import CategoryPanel from './components/CategoryPanel.vue';
 import HotPanel from './components/HotPanel.vue'
 import PageSkeleton from './components/PageSkeleton.vue';
+import { useGuessList } from '@/composables';
 
 const bannerList = ref<BannerItem[]>([])
 const categoryList = ref<CategoryItem[]>([])
@@ -37,7 +39,7 @@ const getHomeHotData = async () => {
 const isLoading = ref(false)
 
 // 用的是uniapp的onLoad而不是小程序
-onLoad(async ()=>{
+onLoad(async () => {
   isLoading.value = true
   await Promise.all([
     getHomeBannerData(),
@@ -47,26 +49,20 @@ onLoad(async ()=>{
   isLoading.value = false
 })
 
-
-//猜你喜欢组件的实例
-const guessRef = ref<XtxGuessInstance>()
-
-// 滚动触底事件
-const onScrolltolower = () => {
-  guessRef.value?.getMore()
-}
+// 猜你喜欢组合式函数调用
+const { guessRef, onScrolltolower } = useGuessList()
 
 // 下拉刷新状态
 const isTriggered = ref(false)
 // 自定义下拉刷新被触发
-const onRefresherrefresh =async () => {
+const onRefresherrefresh = async () => {
   // 开启动画
   isTriggered.value = true
   // 重置猜你喜欢组件数据
   guessRef.value?.resetData() // 加载猜你喜欢组件数据
   await Promise.all([ // 加载其他组件数据
-    getHomeBannerData(), 
-    getHomeCategoryData(), 
+    getHomeBannerData(),
+    getHomeCategoryData(),
     getHomeHotData()
   ])
 
@@ -79,24 +75,22 @@ const onRefresherrefresh =async () => {
   <!--自定义导航栏-->
   <CustomNavbar />
   <!--滚动容器-->
-  <scroll-view 
-    scroll-y 
-    class="scroll-view"
-    @scrolltolower="onScrolltolower"
-    @refresherrefresh="onRefresherrefresh"
-    refresher-enabled
-    :refresher-triggered="isTriggered"
-  >
-    <PageSkeleton v-if="isLoading"/>
+  <scroll-view scroll-y
+               class="scroll-view"
+               @scrolltolower="onScrolltolower"
+               @refresherrefresh="onRefresherrefresh"
+               refresher-enabled
+               :refresher-triggered="isTriggered">
+    <PageSkeleton v-if="isLoading" />
     <template v-else>
       <!--自定义轮播图-->
-      <XtxSwiper :list="bannerList"/>
+      <XtxSwiper :list="bannerList" />
       <!--分类面板-->
-      <CategoryPanel :list="categoryList"/>
+      <CategoryPanel :list="categoryList" />
       <!--热门推荐-->
-      <HotPanel :list="hotList"/>
+      <HotPanel :list="hotList" />
       <!--猜你喜欢-->
-      <XtxGuess ref="guessRef"/>
+      <XtxGuess ref="guessRef" />
     </template>
   </scroll-view>
 </template>
@@ -108,6 +102,7 @@ page {
   display: flex;
   flex-direction: column;
 }
+
 .scroll-view {
   flex: 1;
 }
