@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getMemberProfileAPI } from '@/services/profile';
+import { getMemberProfileAPI, putMemberProfileAPI } from '@/services/profile';
 import type { ProfileDetail } from '@/types/member';
 import { onLoad } from '@dcloudio/uni-app';
 import { ref } from 'vue';
@@ -8,8 +8,8 @@ import { ref } from 'vue';
 const { safeAreaInsets } = uni.getSystemInfoSync()
 
 
-// 获取个人信息
-const profile = ref<ProfileDetail>()
+// 获取个人信息，修改个人信息需提供初始值防止undefined报错
+const profile = ref({} as ProfileDetail)
 const getMemberProfileData = async () => {
   const res = await getMemberProfileAPI()
   profile.value = res.result
@@ -44,6 +44,14 @@ const onAvatarChange = () => {
       })
     },
   })
+}
+
+// 点击保存提交表单
+const onSubmit = async () => {
+  const res = await putMemberProfileAPI({
+    nickname: profile.value?.nickname,
+  })
+  uni.showToast({ icon: 'success', title: '保存成功' })
 }
 </script>
 
@@ -80,7 +88,7 @@ const onAvatarChange = () => {
           <input class="input"
                  type="text"
                  placeholder="请填写昵称"
-                 :value="profile?.nickname" />
+                 v-model="profile!.nickname" />
         </view>
         <view class="form-item">
           <text class="label">性别</text>
@@ -130,7 +138,8 @@ const onAvatarChange = () => {
         </view>
       </view>
       <!-- 提交按钮 -->
-      <button class="form-button">保 存</button>
+      <button class="form-button"
+              @tap="onSubmit">保 存</button>
     </view>
   </view>
 </template>
