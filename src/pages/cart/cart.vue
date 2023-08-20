@@ -17,6 +17,7 @@
 </template>
 
 <script>
+/* eslint-disable */
 var that; // 当前页面对象
 export default {
   data() {
