@@ -2,11 +2,10 @@
 import { getGoodsByIdAPI } from '@/services/goods';
 import type { GoodsResult } from '@/types/goods';
 import { onLoad } from '@dcloudio/uni-app';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import AddressPanel from './components/AddressPanel.vue'
 import ServicePanel from './components/ServicePanel.vue'
 import type { SkuPopupLocaldata, SkuPopupInstanceType } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup';
-import { computed } from 'vue';
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()

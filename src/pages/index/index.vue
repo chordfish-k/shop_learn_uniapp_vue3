@@ -5,7 +5,6 @@ import {
   getHomeHotAPI
 } from '@/services/home';
 import type { BannerItem, CategoryItem, HotItem } from '@/types/home';
-import type { XtxGuessInstance } from '@/types/components'
 import { onLoad } from '@dcloudio/uni-app';
 import { ref } from 'vue';
 
