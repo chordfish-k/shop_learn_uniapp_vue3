@@ -40,7 +40,7 @@ export type ProfileParams = Pick<
     'nickname' | 'gender' | 'profession' | 'birthday'
 > & {
     /** 省份编码 */
-    provinceCOde?: string
+    provinceCode?: string
     /** 城市编码 */
     cityCode?: string
     /** 区/县编码 */
