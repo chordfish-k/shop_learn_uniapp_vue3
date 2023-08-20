@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getMemberAddressByIdAPI, postMemberAddressAPI, putMemberAddressById } from '@/services/address'
-import { onLoad, onReady } from '@dcloudio/uni-app'
+import { onLoad } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 
 // 表单数据
@@ -75,7 +75,6 @@ const rules: UniHelper.UniFormsRules = {
 
 // 表单组件实例
 const formRef = ref<UniHelper.UniFormsInstance>()
-
 
 
 // 提交表单
