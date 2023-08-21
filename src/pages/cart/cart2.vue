@@ -3,6 +3,5 @@ import CartMain from './components/CartMain.vue'
 </script>
 
 <template>
-  <CartMain :mode="1" />
+    <CartMain :mode="2" />
 </template>
-
