@@ -1,8 +1,26 @@
 <script setup lang="ts">
+import { getMemberAddressAPI } from '@/services/address'
+import type { AddressItem } from '@/types/address'
+import { onLoad, onShow } from '@dcloudio/uni-app'
+import { ref } from 'vue'
+
 // 子调父
 const emit = defineEmits<{
     (event: 'close'): void
+    (event: 'address-change', item: AddressItem): void
 }>()
+
+defineProps<{
+    addressList: AddressItem[]
+}>()
+
+// 改变地址时
+const selectedAddress = ref<AddressItem>()
+const onChangeAddress = (item: AddressItem) => {
+    selectedAddress.value = item
+    emit('address-change', item)
+}
+
 </script>
 
 <template>
@@ -14,26 +32,24 @@ const emit = defineEmits<{
         <view class="title">配送至</view>
         <!-- 内容 -->
         <view class="content">
-            <view class="item">
-                <view class="user">李明 13824686868</view>
-                <view class="address">北京市顺义区后沙峪地区安平北街6号院</view>
-                <text class="icon icon-checked"></text>
-            </view>
-            <view class="item">
-                <view class="user">王东 13824686868</view>
-                <view class="address">北京市顺义区后沙峪地区安平北街6号院</view>
-                <text class="icon icon-ring"></text>
-            </view>
-            <view class="item">
-                <view class="user">张三 13824686868</view>
-                <view class="address">北京市朝阳区孙河安平北街6号院</view>
-                <text class="icon icon-ring"></text>
+            <view class="item"
+                  v-for="item in addressList"
+                  :key="item.id"
+                  @tap="onChangeAddress(item)">
+                <view class="user">{{ item.receiver }} {{ item.contact }}</view>
+                <view class="address">{{ item.fullLocation }} {{ item.address }}</view>
+                <text class="icon"
+                      :class="{ 'icon-checked': selectedAddress ? selectedAddress?.id === item.id : item.isDefault }"></text>
             </view>
         </view>
         <view class="footer">
-            <view class="button primary"> 新建地址 </view>
-            <view v-if="false"
-                  class="button primary">确定</view>
+            <view v-if="addressList.length"
+                  class="button primary"
+                  @tap="emit('close')">确定</view>
+            <navigator v-else
+                       class="button primary"
+                       url="/pagesMember/address-form/address-form"> 新建地址 </navigator>
+
         </view>
     </view>
 </template>

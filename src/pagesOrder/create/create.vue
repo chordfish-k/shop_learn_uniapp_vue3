@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { getMemberOrderPreAPI } from '@/services/order'
+import { getMemberAddressAPI } from '@/services/address'
+import { getMemberOrderPreAPI, getMemberOrderPreNowAPI } from '@/services/order'
 import { useAddressStore } from '@/stores/modules/address'
 import type { OrderPreResult } from '@/types/order'
 import { onLoad } from '@dcloudio/uni-app'
@@ -25,11 +26,28 @@ const onChangeDelivery: UniHelper.SelectorPickerOnChange = (ev) => {
 }
 
 
+const query = defineProps<{
+  skuId?: string
+  count?: string
+  addressId?: string
+}>()
+
 // 获取订单信息
 const orderPre = ref<OrderPreResult>()
 const getMemberOrderPreData = async () => {
-  const res = await getMemberOrderPreAPI()
-  orderPre.value = res.result
+  if (query.count && query.skuId) {
+    const res = await getMemberOrderPreNowAPI({
+      count: query.count,
+      skuId: query.skuId
+    })
+    orderPre.value = res.result
+    // 获取地址列表
+    const address = await getMemberAddressAPI()
+    orderPre.value.userAddresses = address.result
+  } else {
+    const res = await getMemberOrderPreAPI()
+    orderPre.value = res.result
+  }
 }
 
 
@@ -41,7 +59,9 @@ onLoad(() => {
 const addressStore = useAddressStore()
 // 收货地址
 const selectedAddress = computed(() => {
-  return addressStore.selectedAddress || orderPre.value?.userAddresses.find(v => v.isDefault)
+  return addressStore.selectedAddress ||
+    orderPre.value?.userAddresses.find(v => v.id === query?.addressId) ||
+    orderPre.value?.userAddresses.find(v => v.isDefault)
 })
 </script>
 
