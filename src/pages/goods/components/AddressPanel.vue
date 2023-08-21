@@ -39,7 +39,10 @@ const onChangeAddress = (item: AddressItem) => {
                 <view class="user">{{ item.receiver }} {{ item.contact }}</view>
                 <view class="address">{{ item.fullLocation }} {{ item.address }}</view>
                 <text class="icon"
-                      :class="{ 'icon-checked': selectedAddress ? selectedAddress?.id === item.id : item.isDefault }"></text>
+                      :class="{
+                          'icon-checked': selectedAddress ? selectedAddress?.id === item.id : item.isDefault,
+                          'icon-ring': !(selectedAddress ? selectedAddress?.id === item.id : item.isDefault)
+                      }"></text>
             </view>
         </view>
         <view class="footer">
