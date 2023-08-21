@@ -107,7 +107,7 @@ const gotoPayment = () => {
         return uni.showToast({ icon: 'none', title: '请选择商品' })
     }
     // 跳转到结算页
-    uni.showToast({ icon: 'none', title: '等待完成' })
+    uni.navigateTo({ url: '/pagesOrder/create/create' })
 }
 </script>
 
