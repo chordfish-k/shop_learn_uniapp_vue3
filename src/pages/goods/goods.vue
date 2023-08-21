@@ -5,7 +5,8 @@ import { onLoad } from '@dcloudio/uni-app';
 import { ref, computed } from 'vue';
 import AddressPanel from './components/AddressPanel.vue'
 import ServicePanel from './components/ServicePanel.vue'
-import type { SkuPopupLocaldata, SkuPopupInstanceType } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup';
+import type { SkuPopupEvent, SkuPopupInstanceType, SkuPopupLocaldata } from '@/components/vk-data-goods-sku-popup/vk-data-goods-sku-popup';
+import { postMemberCartAPI } from '@/services/cart';
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -104,6 +105,14 @@ const skuPopupRef = ref<SkuPopupInstanceType>()
 const selectArrText = computed(() => {
   return skuPopupRef.value?.selectArr?.join(' ').trim() || '请选择商品规格'
 })
+
+
+// 加入购物车事件
+const onAddCart = async (ev: SkuPopupEvent) => {
+  await postMemberCartAPI({ skuId: ev._id, count: ev.buy_num })
+  uni.showToast({ title: '添加成功' })
+  isShowSku.value = false
+}
 </script>
 
 <template>
@@ -114,6 +123,7 @@ const selectArrText = computed(() => {
                            buy-now-background-color="#27ba9b"
                            :mode="mode"
                            ref="skuPopupRef"
+                           @add-cart="onAddCart"
                            :actived-style="{
                              color: '#27BA98',
                              borderColor: '#27BA98',

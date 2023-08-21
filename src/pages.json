@@ -5,7 +5,7 @@
 			// uni-ui 规则如下配置
 			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
 			// 以 Xtx开头的组件，在components文件夹中引入（修改此处要重启服务）
-			"^Xtx(.*)": "@/components/Xtx$1.vue"
+			"^Xtx(.*)": "@/components/Xtx$1.vue",
 		}
 	},
 	"pages": [
