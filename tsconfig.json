@@ -16,7 +16,15 @@
       "@dcloudio/types",
       "miniprogram-api-typings",
       "@uni-helper/uni-app-types",
-      "@uni-helper/uni-ui-types"
+      "@uni-helper/uni-ui-types",
+    ]
+  },
+  "vueCompilerOptions": {
+    "nativeTags": [
+      "block",
+      "component",
+      "templete",
+      "slot"
     ]
   },
   "include": [
