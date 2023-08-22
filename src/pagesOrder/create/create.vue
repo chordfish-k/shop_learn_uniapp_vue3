@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { getMemberAddressAPI } from '@/services/address'
-import { getMemberOrderPreAPI, getMemberOrderPreNowAPI, postMemberOrderAPI } from '@/services/order'
+import { getGoodsByIdAPI } from '@/services/goods'
+import { getMemberOrderByIdAPI, getMemberOrderPreAPI, getMemberOrderPreNowAPI, postMemberOrderAPI } from '@/services/order'
 import { useAddressStore } from '@/stores/modules/address'
+import type { OrderPreGoods } from '@/types/order'
 import type { OrderPreResult } from '@/types/order'
 import { onLoad } from '@dcloudio/uni-app'
 import { computed, ref } from 'vue'
@@ -30,6 +32,7 @@ const query = defineProps<{
   skuId?: string
   count?: string
   addressId?: string
+  orderId?: string
 }>()
 
 // 获取订单信息
@@ -44,7 +47,42 @@ const getMemberOrderPreData = async () => {
     // 获取地址列表
     const address = await getMemberAddressAPI()
     orderPre.value.userAddresses = address.result
-  } else {
+  }
+  else if (query.orderId) {
+    const res = await getMemberOrderByIdAPI(query.orderId)
+
+    orderPre.value = {} as OrderPreResult
+    // 获取价钱
+    orderPre.value.summary = {
+      postFee: res.result.postFee,
+      totalPayPrice: res.result.totalMoney,
+      totalPrice: res.result.payMoney
+    }
+    // 获取地址列表
+    const address = await getMemberAddressAPI()
+    orderPre.value.userAddresses = address.result
+
+    // 获取单品
+    let goods = []
+    for (const v of res.result.skus) {
+      const good = await getGoodsByIdAPI(v.spuId)
+      const item = good.result
+      goods.push({
+        attrsText: v.attrsText,
+        count: v.quantity,
+        id: v.spuId,
+        name: v.name,
+        payPrice: Number(item.price).toFixed(2),
+        picture: v.image,
+        price: Number(item.oldPrice).toFixed(2),
+        skuId: v.id,
+        totalPayPrice: (v.quantity * Number(item.price)).toFixed(2),
+        totalPrice: (v.quantity * Number(item.oldPrice)).toFixed(2),
+      } as OrderPreGoods)
+    }
+    orderPre.value.goods = goods
+  }
+  else {
     const res = await getMemberOrderPreAPI()
     orderPre.value = res.result
   }
@@ -60,8 +98,8 @@ const addressStore = useAddressStore()
 // 收货地址
 const selectedAddress = computed(() => {
   return addressStore.selectedAddress ||
-    orderPre.value?.userAddresses.find(v => v.id === query?.addressId) ||
-    orderPre.value?.userAddresses.find(v => v.isDefault)
+    orderPre.value?.userAddresses?.find(v => v.id === query?.addressId) ||
+    orderPre.value?.userAddresses?.find(v => v.isDefault)
 })
 
 
@@ -150,7 +188,7 @@ const onOrderSubmit = async () => {
     <view class="settlement">
       <view class="item">
         <text class="text">商品总价: </text>
-        <text class="number symbol">{{ orderPre?.summary.totalPrice.toFixed(2) }}</text>
+        <text class="number symbol">{{ orderPre?.summary.totalPrice?.toFixed(2) }}</text>
       </view>
       <view class="item">
         <text class="text">运费: </text>
