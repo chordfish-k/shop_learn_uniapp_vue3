@@ -119,7 +119,10 @@ const onAddCart = async (ev: SkuPopupEvent) => {
 
 // 立即购买
 const onBuyNow = (ev: SkuPopupEvent) => {
-  uni.navigateTo({ url: `/pagesOrder/create/create?skuId=${ev._id}&count=${ev.buy_num}${currentAddress ? '&addressId=' + currentAddress.value?.id : ''}` })
+  uni.navigateTo({
+    url: `/pagesOrder/create/create?skuId=${ev._id}&count=${ev.buy_num}` +
+      `${currentAddress ? '&addressId=' + currentAddress.value?.id : ''}`
+  })
 }
 
 
