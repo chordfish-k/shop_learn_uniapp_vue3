@@ -5,6 +5,7 @@ import { onLoad, onReady } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 import type { OrderResult } from '@/types/order'
 import { OrderState, orderStateList } from '@/services/constants'
+import PageSkeleton from '@/pagesOrder/detail/components/PageSkeleton.vue'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -77,9 +78,16 @@ const getMemberOrderByIdData = async () => {
   OrderState.DaiFuKuan
 }
 
-onLoad(() => {
+onLoad(async () => {
   getMemberOrderByIdData()
 })
+
+
+// 倒计时结束
+const onTimeUp = () => {
+  // 修改订单状态为已取消
+  order.value!.orderState = OrderState.YiQuXiao
+}
 </script>
 
 <template>
@@ -112,7 +120,12 @@ onLoad(() => {
           <view class="tips">
             <text class="money">应付金额: ¥ {{ order?.payMoney.toFixed(2) }}</text>
             <text class="time">支付剩余</text>
-            00 时 29 分 59 秒
+            <uni-countdown :second="order.countdown"
+                           color="#fff"
+                           splitor-color="#fff"
+                           :show-day="false"
+                           :show-colon="false"
+                           @timeup="onTimeUp" />
           </view>
           <view class="button">去支付</view>
         </template>
