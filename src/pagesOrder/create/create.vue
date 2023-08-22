@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { getMemberAddressAPI } from '@/services/address'
 import { getGoodsByIdAPI } from '@/services/goods'
-import { getMemberOrderByIdAPI, getMemberOrderPreAPI, getMemberOrderPreNowAPI, postMemberOrderAPI } from '@/services/order'
+import { getMemberOrderByIdAPI, getMemberOrderPreAPI, getMemberOrderPreNowAPI, getMemberOrderRepurchaseByIdAPI, postMemberOrderAPI } from '@/services/order'
 import { useAddressStore } from '@/stores/modules/address'
-import type { OrderPreGoods } from '@/types/order'
+import type { OrderCreateParams, OrderPreGoods } from '@/types/order'
 import type { OrderPreResult } from '@/types/order'
 import { onLoad } from '@dcloudio/uni-app'
 import { computed, ref } from 'vue'
@@ -51,38 +51,9 @@ const getMemberOrderPreData = async () => {
   }
   // 情况二：从订单详情页点击再次够没并跳转
   else if (query.orderId) {
-    const res = await getMemberOrderByIdAPI(query.orderId)
-
-    orderPre.value = {} as OrderPreResult
-    // 获取价钱
-    orderPre.value.summary = {
-      postFee: res.result.postFee,
-      totalPayPrice: res.result.totalMoney,
-      totalPrice: res.result.payMoney
-    }
-    // 获取地址列表
-    const address = await getMemberAddressAPI()
-    orderPre.value.userAddresses = address.result
-
-    // 获取单品
-    let goods = []
-    for (const v of res.result.skus) {
-      const good = await getGoodsByIdAPI(v.spuId)
-      const item = good.result
-      goods.push({
-        attrsText: v.attrsText,
-        count: v.quantity,
-        id: v.spuId,
-        name: v.name,
-        payPrice: Number(item.price).toFixed(2),
-        picture: v.image,
-        price: Number(item.oldPrice).toFixed(2),
-        skuId: v.id,
-        totalPayPrice: (v.quantity * Number(item.price)).toFixed(2),
-        totalPrice: (v.quantity * Number(item.oldPrice)).toFixed(2),
-      } as OrderPreGoods)
-    }
-    orderPre.value.goods = goods
+    // 再次购买      
+    const res = await getMemberOrderRepurchaseByIdAPI(query.orderId)
+    orderPre.value = res.result
   }
   // 情况三：从购物车页点击去结算并跳转
   else {
@@ -114,14 +85,16 @@ const onOrderSubmit = async () => {
       title: '请选择收货地址'
     })
   }
-  const res = await postMemberOrderAPI({
+  const data = {
     addressId: selectedAddress.value?.id,
     buyerMessage: buyerMessage.value,
     deliveryTimeType: activeDelivery.value.type,
     goods: orderPre.value!.goods.map(v => ({ count: v.count, skuId: v.skuId })),
     payChannel: 2,
     payType: 1,
-  })
+  } as OrderCreateParams
+  console.log(data)
+  const res = await postMemberOrderAPI(data)
   // 关闭当前页面，跳转到订单详情，传递订单id
   uni.redirectTo({ url: `/pagesOrder/detail/detail?id=${res.result.id}` })
 }

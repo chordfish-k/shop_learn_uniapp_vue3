@@ -22,6 +22,7 @@ const query = defineProps<{
 const goods = ref<GoodsResult>()
 const getGoodsByIdData = async () => {
   const res = await getGoodsByIdAPI(query.id)
+  console.log(res)
   goods.value = res.result
   // SKU组件所需格式
   localdata.value = {

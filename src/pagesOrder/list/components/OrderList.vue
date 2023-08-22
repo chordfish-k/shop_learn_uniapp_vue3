@@ -21,22 +21,44 @@ const queryParms: OrderListParams = {
     orderState: props.orderState,
 }
 
+// 已结束标记
+const finish = ref(false)
 // 获取订单列表
 const orderList = ref<OrderItem[]>([])
 const getMemberOrderData = async () => {
+    // 退出分页判断：没有更多数据则退出
+    if (finish.value === true) {
+        return
+        // return uni.showToast({ icon: 'none', title: '没有更多数据~' })
+    }
     const res = await getMemberOrderAPI(queryParms)
-    orderList.value = res.result.items
+    console.log(res)
+    // 数组追加
+    orderList.value.push(...res.result.items)
+    // 分页条件
+    if (queryParms.page! < res.result.pages) {
+        // 页码累加
+        queryParms.page!++
+    } else {
+        finish.value = true
+    }
 }
 
 onMounted(() => {
     getMemberOrderData()
 })
+
+// 滚动触底事件
+const onScrolltolower: UniHelper.ScrollViewOnScrolltolower = () => {
+    getMemberOrderData()
+}
 </script>
 
 
 <template>
     <scroll-view scroll-y
-                 class="orders">
+                 class="orders"
+                 @scrolltolower="onScrolltolower">
         <view class="card"
               v-for="order in orderList"
               :key="order.id">
@@ -78,7 +100,7 @@ onMounted(() => {
                 </template>
                 <template v-else>
                     <navigator class="button secondary"
-                               :url="`/pagesOrder/create/create?orderId=id`"
+                               :url="`/pagesOrder/create/create?orderId=${order.id}`"
                                hover-class="none">
                         再次购买
                     </navigator>
@@ -91,7 +113,7 @@ onMounted(() => {
         <!-- 底部提示文字 -->
         <view class="loading-text"
               :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }">
-            {{ true ? '没有更多数据~' : '正在加载...' }}
+            {{ finish ? '没有更多数据~' : '正在加载...' }}
         </view>
     </scroll-view>
 </template>
