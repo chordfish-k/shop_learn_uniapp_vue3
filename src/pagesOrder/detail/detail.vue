@@ -6,6 +6,7 @@ import { ref } from 'vue'
 import type { OrderResult } from '@/types/order'
 import { OrderState, orderStateList } from '@/services/constants'
 import PageSkeleton from '@/pagesOrder/detail/components/PageSkeleton.vue'
+import { getPayMockAPI, getPayWxPayMiniPayAPI } from '@/services/pay'
 
 // 获取屏幕边界到安全区域距离
 const { safeAreaInsets } = uni.getSystemInfoSync()
@@ -88,6 +89,22 @@ const onTimeUp = () => {
   // 修改订单状态为已取消
   order.value!.orderState = OrderState.YiQuXiao
 }
+
+
+// 订单支付
+const onOrderPay = async () => {
+  // 通过环境变量区分开发环境
+  if (import.meta.env.DEV) {
+    // 开发环境：模拟支付，修改订单状态为已支付
+    await getPayMockAPI({ orderId: query.id })
+  } else {
+    // 生产环境：获取支付参数 + 发起微信支付
+    const res = await getPayWxPayMiniPayAPI({ orderId: query.id })
+    await wx.requestPayment(res.result)
+  }
+  // 关闭当前页，再跳转支付结果页
+  uni.redirectTo({ url: `/pagesOrder/payment/payment?id=${query.id}` })
+}
 </script>
 
 <template>
@@ -127,7 +144,8 @@ const onTimeUp = () => {
                            :show-colon="false"
                            @timeup="onTimeUp" />
           </view>
-          <view class="button">去支付</view>
+          <view class="button"
+                @tap="onOrderPay">去支付</view>
         </template>
         <!-- 其他订单状态:展示再次购买按钮 -->
         <template v-else>
@@ -187,7 +205,7 @@ const onTimeUp = () => {
           </navigator>
           <!-- 待评价状态:展示按钮 -->
           <view class="action"
-                v-if="true">
+                v-if="order.orderState === OrderState.DaiPingJia">
             <view class="button primary">申请售后</view>
             <navigator url=""
                        class="button"> 去评价 </navigator>
@@ -231,8 +249,9 @@ const onTimeUp = () => {
       <view class="toolbar"
             :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }">
         <!-- 待付款状态:展示支付按钮 -->
-        <template v-if="true">
-          <view class="button primary"> 去支付 </view>
+        <template v-if="order.orderState === OrderState.DaiFuKuan">
+          <view class="button primary"
+                @tap="onOrderPay"> 去支付 </view>
           <view class="button"
                 @tap="popup?.open?.()"> 取消订单 </view>
         </template>
