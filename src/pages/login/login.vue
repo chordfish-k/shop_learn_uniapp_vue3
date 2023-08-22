@@ -66,8 +66,9 @@ const onSubmit = async () => {
     <view class="logo">
       <image src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/logo_icon.png"></image>
     </view>
-    <!-- #ifdef H5 -->
+
     <view class="login">
+      <!-- #ifdef H5 -->
       <input class="input"
              open-type="text"
              placeholder="请输入用户名/手机号码" />
