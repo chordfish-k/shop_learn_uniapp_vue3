@@ -38,6 +38,7 @@ const query = defineProps<{
 // 获取订单信息
 const orderPre = ref<OrderPreResult>()
 const getMemberOrderPreData = async () => {
+  // 情况一：从商品详情页面点击立即购买并跳转
   if (query.count && query.skuId) {
     const res = await getMemberOrderPreNowAPI({
       count: query.count,
@@ -48,6 +49,7 @@ const getMemberOrderPreData = async () => {
     const address = await getMemberAddressAPI()
     orderPre.value.userAddresses = address.result
   }
+  // 情况二：从订单详情页点击再次够没并跳转
   else if (query.orderId) {
     const res = await getMemberOrderByIdAPI(query.orderId)
 
@@ -82,6 +84,7 @@ const getMemberOrderPreData = async () => {
     }
     orderPre.value.goods = goods
   }
+  // 情况三：从购物车页点击去结算并跳转
   else {
     const res = await getMemberOrderPreAPI()
     orderPre.value = res.result
