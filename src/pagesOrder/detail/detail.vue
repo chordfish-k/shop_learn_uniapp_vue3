@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useGuessList } from '@/composables'
-import { getMemberOrderByIdAPI, getMemberOrderConsignmentByIdAPI, putMemberOrderReceiptByIdAPI, getMemberOrderLogisticsByIdAPI } from '@/services/order'
+import { getMemberOrderByIdAPI, getMemberOrderConsignmentByIdAPI, deleteMemberOrderAPI, putMemberOrderReceiptByIdAPI, getMemberOrderLogisticsByIdAPI } from '@/services/order'
 import { onLoad, onReady } from '@dcloudio/uni-app'
 import { ref } from 'vue'
 import type { LogisticItem, OrderResult } from '@/types/order'
@@ -140,6 +140,21 @@ const onOrderComfirm = () => {
         const res = await putMemberOrderReceiptByIdAPI(query.id)
         // 更新订单状态
         order.value = res.result
+      }
+    },
+  })
+}
+
+
+// 删除订单
+const onOrderDelete = () => {
+  // 二次确认
+  uni.showModal({
+    content: '是否删除订单',
+    success: async (success) => {
+      if (success.confirm) {
+        await deleteMemberOrderAPI({ ids: [query.id] })
+        uni.redirectTo({ url: '/pagesOrder/list/list' })
       }
     },
   })
@@ -311,8 +326,9 @@ const onOrderComfirm = () => {
           <view v-if="order.orderState === OrderState.DaiPingJia"
                 class="button"> 去评价 </view>
           <!-- 待评价/已完成/已取消 状态: 展示删除订单 -->
-          <view v-if="order.orderState in [OrderState.DaiPingJia, OrderState.YiWanCheng, OrderState.YiQuXiao]"
-                class="button delete"> 删除订单 </view>
+          <view v-if="order.orderState >= OrderState.DaiPingJia"
+                class="button delete"
+                @tap="onOrderDelete"> 删除订单 </view>
         </template>
       </view>
     </template>
@@ -697,6 +713,8 @@ page {
 
   .delete {
     order: 4;
+    color: #ea6763;
+    border-color: #ea6763;
   }
 
   .button {
