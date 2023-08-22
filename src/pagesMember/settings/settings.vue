@@ -30,6 +30,7 @@ const onLogout = () => {
       </navigator>
     </view>
     <!-- 列表2 -->
+    <!-- #ifdef MP-WEIXIN-->
     <view class="list">
       <button hover-class="none"
               class="item arrow"
@@ -41,6 +42,8 @@ const onLogout = () => {
               class="item arrow"
               open-type="contact">联系我们</button>
     </view>
+    <!-- #endif-->
+
     <!-- 列表3 -->
     <view class="list">
       <navigator hover-class="none"

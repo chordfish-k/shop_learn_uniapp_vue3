@@ -267,10 +267,12 @@ const onAddressChange = (item: AddressItem) => {
         :style="{ paddingBottom: safeAreaInsets?.bottom + 'px' }">
     <view class="icons">
       <button class="icons-button"><text class="icon-heart"></text>收藏</button>
+      <!-- #ifdef MP-WEIXIN-->
       <button class="icons-button"
               open-type="contact">
         <text class="icon-handset"></text>客服
       </button>
+      <!-- #endif-->
       <navigator class="icons-button"
                  url="/pages/cart/cart2">
         <text class="icon-cart"></text>购物车

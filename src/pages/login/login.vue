@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { postLoginWxMinAPI, postLoginWxMinSimpleAPI } from '@/services/login';
+import { postLoginAPI, postLoginWxMinAPI, postLoginWxMinSimpleAPI } from '@/services/login';
 import { useMemberStore } from '@/stores';
 import type { LoginResult } from '@/types/member';
 import { onLoad } from '@dcloudio/uni-app';
+import { ref } from 'vue';
 
-
+// #ifdef MP-WEIXIN
 // 获取 code 登录凭证
 let code = ''
 onLoad(async () => {
@@ -23,6 +24,7 @@ const onGetPhoneNumber: UniHelper.ButtonOnGetphonenumber = async (ev) => {
   })
   loginSuccess(res.result)
 }
+// #endif
 
 // 模拟用户手机号码快捷登录
 const onGetPhoneNumberSimple = async () => {
@@ -43,6 +45,20 @@ const loginSuccess = (profile: LoginResult) => {
     uni.navigateBack()
   }, 500)
 }
+
+// #ifdef H5
+// 传统表单登录，测试账号：13123456789 密码：123456，测试账号仅开发学习使用。
+const form = ref({
+  account: '13123456789',
+  password: '',
+})
+
+// 表单提交
+const onSubmit = async () => {
+  const res = await postLoginAPI(form.value)
+  loginSuccess(res.result)
+}
+// #endif
 </script>
 
 <template>
@@ -50,13 +66,26 @@ const loginSuccess = (profile: LoginResult) => {
     <view class="logo">
       <image src="https://pcapi-xiaotuxian-front-devtest.itheima.net/miniapp/images/logo_icon.png"></image>
     </view>
+    <!-- #ifdef H5 -->
     <view class="login">
+      <input class="input"
+             open-type="text"
+             placeholder="请输入用户名/手机号码" />
+      <input class="input"
+             open-type="text"
+             password
+             placeholder="请输入密码" />
+      <button @tap="onSubmit"
+              class="button phone">登录</button>
+      <!-- #endif -->
+      <!-- #ifdef MP-WEIXIN-->
       <button class="button phone"
               open-type="getPhoneNumber"
               @getphonenumber="onGetPhoneNumber">
         <text class="icon icon-phone"></text>
         手机号快捷登录
       </button>
+      <!-- #endif -->
       <view class="extra">
         <view class="caption">
           <text>其他登录方式</text>
@@ -100,6 +129,16 @@ page {
   flex-direction: column;
   height: 60vh;
   padding: 40rpx 20rpx 20rpx;
+
+  .input {
+    width: 100%;
+    height: 80rpx;
+    font-size: 28rpx;
+    border-radius: 72rpx;
+    border: 1px solid #ddd;
+    padding-left: 30rpx;
+    margin-bottom: 20rpx;
+  }
 
   .button {
     display: flex;
